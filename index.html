@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html>
   <head>
     <meta charset="utf-8" />
@@ -68,51 +69,6 @@ outline: 0;
         <div class="container">
           <h1>Atelier elasticsearch.</h1>
           <hr>
-          <h3>0. Prérequis</h3>
-          <ul>
-            <li>Avoir un mongodb en mode replica set (obligatoire pour la river mongodb). Vous pouvez trouver une doc&nbsp;<a href="http://docs.mongodb.org/manual/tutorial/deploy-replica-set/" target="_blank">ici</a>
-            <li>Importer le fichier de données (<a href="https://s3-eu-west-1.amazonaws.com/xke-workshop-es/data.tgz">ici</a>) dans la base <b>test-es</b>, collection <b>customers</b>
-          </ul>
-          <div class="accordion" id="accordion01">
-            <div class="accordion-group">
-              <div class="accordion-heading">
-                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion01" href="#collapse01">
-                  Solution
-                </a>
-              </div>
-              <div id="collapse01" class="accordion-body collapse">
-                <div class="accordion-inner">
-                  <pre>$ wget http://fastdl.mongodb.org/osx/mongodb-osx-x86_64-2.4.1.tgz
-$ tar -xvf mongodb-osx-x86_64-2.4.1.tgz
-$ cd mongodb-osx-x86_64-2.4.1/bin/
-$ mongod --replSet rs0
-$ mongo
-> rs.initiate()
-> exit
-$ tar -xvf ~/Downloads/data.tgz
-$ mongoimport -db test-es --collection customers --file test.json
-</pre>
-Pour les personnes qui ont installé mongodb avec brew, il faut faire comme suit : 
-<pre>
-$ vi ~/Library/LaunchAgents/homebrew.mxcl.mongodb.plist -- Et rajouter les paramères --replSet rs0
-$ mongo
-> rsconf = {
-           _id: "rs0",
-           members: [
-                      {
-                       _id: 0,
-                       host: "localhost:27017"
-                      }
-                    ]
-         }
-> rs.initiate(rsconf)
-> exit
-</pre>
-
-                </div>
-              </div>
-            </div>
-          </div>
           <h3>1. Installer elasticsearch</h3>
          Vous pouvez télécharger eleasticsearch 0.20.6 <a href="http://www.elasticsearch.org/download/" target="_blank">ici</a>. <b>Attention !</b> La version 0.90.0.RC1 n’est pas compatible avec tous les plugins. Nommer votre cluster avec votre nom dans le fichier elastisearch.yml (param cluster.name) pour éviter les conflits avec vos petits camarades !<br/><br/>
           <div class="accordion" id="accordion11">
@@ -131,31 +87,7 @@ $ vi elasticsearch.yml</pre></div>
               </div>
             </div>
           </div>
- <h3>2. Installer des plugins</h3>
- Pour l'atelier, nous allons utiliser les plugins suivants :
- <ul>
-    <li> head : <a href="https://github.com/mobz/elasticsearch-head" target="_blank">Homepage</a>
-    <li> bigdesk : <a href="https://github.com/lukas-vlcek/bigdesk" target="_blank">Homepage</a>
-    <li> mongodb river : <a href="https://github.com/richardwilly98/elasticsearch-river-mongodb" target="_blank">Homepage</a>
-  </ul>
-<div class="accordion" id="accordion21">
-            <div class="accordion-group">
-              <div class="accordion-heading">
-                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion21" href="#collapse21">
-                  Solution
-                </a>
-              </div>
-              <div id="collapse21" class="accordion-body collapse">
-                <div class="accordion-inner">
-<pre>$ cd elasticsearch-0.20.6/bin
-$ ./plugin -install mobz/elasticsearch-head
-$ ./plugin -install lukas-vlcek/bigdesk
-$ ./plugin -install elasticsearch/elasticsearch-mapper-attachments/1.6.0
-$ ./plugin -url https://github.com/downloads/richardwilly98/elasticsearch-river-mongodb/elasticsearch-river-mongodb-1.6.4.zip -install river-mongodb</pre>
-                </div>
-              </div>
-            </div>
-          </div>
+
 <h3>3. Insérer des documents</h3>
 Pour les premières recherches, nous allons utiliser l'index <b>foo</b> et des documents de type <b>bar</b>. Voici les documents à insérer:<br/><br/>
 <div class="accordion" id="accordion31">
@@ -276,7 +208,7 @@ ou encore plus simple
 
 <h3>5. Chercher des documents (1/3)</h3>
 
-Faire une recherche pour trouver le document qui contient dans le champ text <b>America</b> en faisant une requête dans l'url et ensuite une requête "match" en JSON<br><br>
+Faire une recherche pour trouver le document qui contient dans le champ text <b>america</b> en faisant une requête dans l'url et ensuite une requête "match" en JSON<br><br>
 
 <div class="accordion" id="accordion51">
             <div class="accordion-group">
@@ -301,11 +233,11 @@ Vous pouvez trouver la documentation de la query DSL <a href="http://www.elastic
               </div>
               <div id="collapse52" class="accordion-body collapse">
                 <div class="accordion-inner">
-<pre>$ curl -XPOST 'http://localhost:9200/foo/bar/_search?q=text:America'
+<pre>$ curl -XPOST 'http://localhost:9200/foo/bar/_search?q=text:america'
 $ curl -XPOST 'http://localhost:9200/foo/bar/_search' -d '{
   "query" : {
     "match" : {
-      "text" : "America"
+      "text" : "america"
     }
   }
 }'</pre>
@@ -314,7 +246,7 @@ $ curl -XPOST 'http://localhost:9200/foo/bar/_search' -d '{
             </div>
           </div>
 <h3>6. Chercher des documents (2/3)</h3>
-Faire une recherche avec comme critère <b>Ameri*a</b> en faisant une requête wildcard et ensuite avec comme critère <b>Ameriqa</b> en faisant une recherche fuzzy<br><br>
+Faire une recherche avec comme critère <b>ameri*a</b> en faisant une requête wildcard et ensuite avec comme critère <b>ameriqa</b> en faisant une recherche fuzzy<br><br>
 <div class="accordion" id="accordion61">
             <div class="accordion-group">
               <div class="accordion-heading">
@@ -399,7 +331,7 @@ Vous pouvez trouver la documentation de la facet terms <a href="http://www.elast
             </div>
           </div>
 <h3>8. Altérer la réponse</h3>
-Faire la recherche pour trouver le document qui contient <b>America</b> tout en formattant la réponse pour qu'elle soit lisible humainement, et afficher l'explication du scoring.<br><br>
+Faire la recherche pour trouver le document qui contient <b>america</b> tout en formattant la réponse pour qu'elle soit lisible humainement, et afficher l'explication du scoring.<br><br>
 <div class="accordion" id="accordion81">
             <div class="accordion-group">
               <div class="accordion-heading">
@@ -413,7 +345,7 @@ Faire la recherche pour trouver le document qui contient <b>America</b> tout en 
   "explain": true,
   "query" : {
     "match" : {
-      "text" : "America"
+      "text" : "america"
     }
   }
 }'</pre>
@@ -467,17 +399,17 @@ Ecrire une requête de percolation qui match les documents contenant <b>toto</b>
                 <div class="accordion-inner">
 <pre>$ curl -XPUT 'http://localhost:9200/_percolator/foo/toto' -d '{"query": {"term":{"_all":"toto"}}}' 
 $ curl -XPOST 'http://localhost:9200/foo/bar/?percolate=*' -d '{
-> "title" : "Une blague",
-> "author" : "toto",
-> "submissionDate" : "2013-04-01",
-> "text" : "blah blah blah"
-> }'</pre>
+ "title" : "Une blague",
+ "author" : "toto",
+ "submissionDate" : "2013-04-01",
+ "text" : "blah blah blah"
+ }'</pre>
                 </div>
               </div>
             </div>
           </div>
 <h3>10. Delete document</h3>
-Effacer le document contenant <b>America</b><br><br>
+Effacer le document contenant <b>america</b><br><br>
 <div class="accordion" id="accordion91">
             <div class="accordion-group">
               <div class="accordion-heading">
@@ -488,18 +420,42 @@ Effacer le document contenant <b>America</b><br><br>
               <div id="collapse91" class="accordion-body collapse">
                 <div class="accordion-inner">
 <pre>$ curl -XDELETE 'http://localhost:9200/foo/bar/_query' -d '{
-  "query" : {
     "match" : {
-      "text" : "America"
+      "text" : "america"
     }
-  }
 }'</pre>
                 </div>
               </div>
             </div>
           </div>
 
-<h3>11. Initialiser la river mongodb (1/2)</h3>
+ <h3>2. Installer le plugin HEAD</h3>
+ Pour mieux comprendre de clustering le plugin HEAD permet de visualiser la répartition des index sur les différentes instances.
+ <ul>
+    <li> head : <a href="https://github.com/mobz/elasticsearch-head" target="_blank">Homepage</a>
+  </ul>
+<div class="accordion" id="accordion21">
+            <div class="accordion-group">
+              <div class="accordion-heading">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion21" href="#collapse21">
+                  Solution
+                </a>
+              </div>
+              <div id="collapse21" class="accordion-body collapse">
+                <div class="accordion-inner">
+<pre>$ cd elasticsearch-0.20.6/bin
+$ ./plugin -install mobz/elasticsearch-head</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+<h3>17. Démarrer 2 nouvelles instances es, et allez voir dans head la nouvelle répartition des shards</h3>
+Relancer elasticsearch plusieurs fois et aller voir sur head les shards se répartirent sur les différentes instances.
+
+
+<h3>11. Initialiser la river mongodb (1/3)</h3>
 Avant d'initialiser la river mongo, pour permettre l'interprétation du champ location du document mongo, initialiser l'index <b>bank</b>, avec des documents de type <b>customers</b> et customiser le mapping du champ location pour qu'il soit de type geo_point<br><br>
 <div class="accordion" id="accordion91">
             <div class="accordion-group">
@@ -536,7 +492,52 @@ $ curl -XPUT 'http://localhost:9200/bank/customers/_mapping' -d '{
               </div>
             </div>
           </div>
-<h3>12. Initialiser la river mongodb (2/2)</h3>
+
+
+<h3>12. Initialiser la river mongodb (2/3)</h3>
+ Pour activer la river mongodb installer le plugin suivant:
+ <ul>
+    <li> mongodb river : <a href="https://github.com/richardwilly98/elasticsearch-river-mongodb" target="_blank">Homepage</a>
+  </ul>
+<div class="accordion" id="accordion211">
+            <div class="accordion-group">
+              <div class="accordion-heading">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion211" href="#collapse211">
+                  Solution
+                </a>
+              </div>
+              <div id="collapse211" class="accordion-body collapse">
+                <div class="accordion-inner">
+<pre>$ cd elasticsearch-0.20.6/bin
+$ ./plugin -install elasticsearch/elasticsearch-mapper-attachments/1.6.0
+$ ./plugin -url https://github.com/downloads/richardwilly98/elasticsearch-river-mongodb/elasticsearch-river-mongodb-1.6.4.zip -install river-mongodb</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+
+Afin d'observer l'activité d'elasticsearch lors de l'indexation de mongodb vous pouvez installer le plugin bigdesk:
+ <ul>
+    <li> bigdesk : <a href="https://github.com/lukas-vlcek/bigdesk" target="_blank">Homepage</a>
+  </ul>
+<div class="accordion" id="accordion212">
+            <div class="accordion-group">
+              <div class="accordion-heading">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion212" href="#collapse212">
+                  Solution
+                </a>
+              </div>
+              <div id="collapse212" class="accordion-body collapse">
+                <div class="accordion-inner">
+<pre>$ cd elasticsearch-0.20.6/bin
+$ ./plugin -install lukas-vlcek/bigdesk
+</pre>
+                </div>
+              </div>
+            </div>
+          </div>          
+
+<h3>12. Initialiser la river mongodb (3/3)</h3>
 Initialiser la river mongodb pour créer l'index <b>bank</b>, avec des documents de type <b>customers</b><br><br>
 <div class="accordion" id="accordion111">
             <div class="accordion-group">
@@ -677,8 +678,7 @@ Chercher les personnes qui se trouvent à moins de 20km de Paris.<br><br>
           </div>
 <h3>16. Ajouter un document mongo et voir que l’index l’a pris en compte grâce a la river</h3>
 Ajouter un document pour s'assurer que le document est bien disponible sur l'index.
-<h3>17. Démarrer 2 nouvelles instances es, et allez voir dans head la nouvelle répartition des shards</h3>
-Relancer elasticsearch plusieurs fois et aller voir sur head les shards se répartirent sur les différentes instances.
+
 <h3>18. Bonux pour les rapides</h3>
 Instancier un elasticsearch sur une instance EC2 et faire de telle manière que l'on puisse faire un AMI pour instancier de nouveaux noeuds juste en démarrant une instance EC2 de l'AMI. Faire de telle manière que l'index est stocké sur S3. Un bon tutorial se trouve <a href="http://www.elasticsearch.org/tutorials/elasticsearch-on-ec2/" target="_blank">ici</a> si besoin :)
 <br><br><br><br><br><br>

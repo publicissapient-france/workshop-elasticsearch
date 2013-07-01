@@ -70,7 +70,7 @@ outline: 0;
           <h1>Atelier elasticsearch.</h1>
           <hr>
           <h3>1. Installer elasticsearch</h3>
-         Vous pouvez télécharger eleasticsearch 0.20.6 <a href="http://www.elasticsearch.org/download/" target="_blank">ici</a>. <b>Attention !</b> La version 0.90.0.RC1 n’est pas compatible avec tous les plugins. Nommer votre cluster avec votre nom dans le fichier elastisearch.yml (param cluster.name) pour éviter les conflits avec vos petits camarades !<br/><br/>
+         Vous pouvez télécharger eleasticsearch 0.20.6 <a href="http://www.elasticsearch.org/download/" target="_blank">ici</a>. <b>Attention !</b> Les versions 0.90.X ne sont pas compatibles avec tous les plugins. Nommer votre cluster avec votre nom dans le fichier elastisearch.yml (param cluster.name) pour éviter les conflits avec vos petits camarades !<br/><br/>
           <div class="accordion" id="accordion11">
             <div class="accordion-group">
               <div class="accordion-heading">
@@ -80,16 +80,34 @@ outline: 0;
               </div>
               <div id="collapse11" class="accordion-body collapse">
                 <div class="accordion-inner">
-<pre>$ wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-0.20.6.tar.gz
+<pre>$ curl -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-0.20.6.tar.gz
 $ tar -xvf elasticsearch-0.20.6.tar.gz
 $ cd elasticsearch-0.20.6/config/
-$ vi elasticsearch.yml</pre></div>
+$ vi elasticsearch.yml
+(repérer la ligne #cluster.name: elasticsearch, la décommenter et mettre un nom de cluster unique à vous.)</pre></div>
               </div>
             </div>
           </div>
-
+          <h3>2. Lancer elasticsearch</h3>
+         Vous pouvez dès à présent lancer elasticsearch via la ligne de commande. Lancer l'executable qui se trouve dans votre répertoire extrait avec l'option -f pour pouvoir suivre les logs dans la console.<br/><br/>
+          <div class="accordion" id="accordion112">
+            <div class="accordion-group">
+              <div class="accordion-heading">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion112" href="#collapse112">
+                  Solution
+                </a>
+              </div>
+              <div id="collapse112" class="accordion-body collapse">
+                <div class="accordion-inner">
+<pre>$ cd ../bin/
+$ ./elasticsearch -f
+</pre></div>
+              </div>
+            </div>
+          </div>
+On voit dans les logs que le port d'écoute par défaut d'elasticsearch est le 9200. On peut s'assurer qu'elasticsearch est bien démarré en allant sur <a href="http://localhost:9200/" target="_blank">http://localhost:9200/</a>. Vous devez y voir un JSON recapitulant les caractéristiques de votre serveur.
 <h3>3. Insérer des documents</h3>
-Pour les premières recherches, nous allons utiliser l'index <b>foo</b> et des documents de type <b>bar</b>. Voici les documents à insérer:<br/><br/>
+Maintenant qu'elasticsearch est démarré, nous pouvons insérer des documents. Pour les premières recherches, nous allons utiliser l'index <b>foo</b> et des documents de type <b>bar</b>. Voici les documents à insérer :<br/><br/>
 <div class="accordion" id="accordion31">
             <div class="accordion-group">
               <div class="accordion-heading">
@@ -168,9 +186,16 @@ $ curl -XPOST 'http://localhost:9200/foo/bar/' -d '{
               </div>
             </div>
           </div>
-
+En retour de chaque insertion on peut observer le retour de chaque requête sous la forme :<br/><br/> 
+<pre>{
+  "ok":true,
+  "_index":"foo",  #Nom de l'index
+  "_type":"bar",  #Type de document
+  "_id":"VG0DGGVuQ_yV-JPs30ZqpA",  #Id auto généré du document
+  "_version":1  #Version du document
+}</pre>
 <h3>4. Afficher le contenu de l’index</h3>
-Pour s'assurer que les documents sont bien dans l'index, afficher le contenu de l'index foo.<br><br>
+Pour s'assurer que les documents sont bien dans l'index, afficher le contenu de l'index foo en utilisant l'api search.<br><br>
 <div class="accordion" id="accordion41">
             <div class="accordion-group">
               <div class="accordion-heading">
@@ -194,13 +219,13 @@ Vous pouvez trouver la documentation de l'api search <a href="http://www.elastic
               </div>
               <div id="collapse42" class="accordion-body collapse">
                 <div class="accordion-inner">
-<pre>$curl -XGET 'http://localhost:9200/foo/_search' -d '{
+<pre>$ curl -XGET 'http://localhost:9200/foo/_search' -d '{
   "query" : {
     "match_all" : {}
   }
 }'</pre>
 ou encore plus simple
-<pre>$curl -XGET 'http://localhost:9200/foo/_search'</pre>
+<pre>$ curl -XGET 'http://localhost:9200/foo/_search'</pre>
                 </div>
               </div>
             </div>
@@ -429,7 +454,7 @@ Effacer le document contenant <b>america</b><br><br>
             </div>
           </div>
 
- <h3>2. Installer le plugin HEAD</h3>
+ <h3>11. Installer le plugin HEAD</h3>
  Pour mieux comprendre de clustering le plugin HEAD permet de visualiser la répartition des index sur les différentes instances.
  <ul>
     <li> head : <a href="https://github.com/mobz/elasticsearch-head" target="_blank">Homepage</a>
@@ -449,13 +474,12 @@ $ ./plugin -install mobz/elasticsearch-head</pre>
               </div>
             </div>
           </div>
+Un fois installé, vous pouvez accéder à l'interface du plugin ici : <a href="http://localhost:9200/_plugin/head/" target="_blank">http://localhost:9200/_plugin/head/</a>
 
+<h3>12. Démarrer 2 nouvelles instances ElasticSearch, et allez voir dans head la nouvelle répartition des shards</h3>
+Relancer elasticsearch plusieurs fois et aller voir sur head les shards se répartisent sur les différentes instances.
 
-<h3>17. Démarrer 2 nouvelles instances es, et allez voir dans head la nouvelle répartition des shards</h3>
-Relancer elasticsearch plusieurs fois et aller voir sur head les shards se répartirent sur les différentes instances.
-
-
-<h3>11. Initialiser la river mongodb (1/3)</h3>
+<h3>13. Initialiser la river mongodb (1/3)</h3>
 Avant d'initialiser la river mongo, pour permettre l'interprétation du champ location du document mongo, initialiser l'index <b>bank</b>, avec des documents de type <b>customers</b> et customiser le mapping du champ location pour qu'il soit de type geo_point<br><br>
 <div class="accordion" id="accordion91">
             <div class="accordion-group">
@@ -494,7 +518,7 @@ $ curl -XPUT 'http://localhost:9200/bank/customers/_mapping' -d '{
           </div>
 
 
-<h3>12. Initialiser la river mongodb (2/3)</h3>
+<h3>14. Initialiser la river mongodb (2/3)</h3>
  Pour activer la river mongodb installer le plugin suivant:
  <ul>
     <li> mongodb river : <a href="https://github.com/richardwilly98/elasticsearch-river-mongodb" target="_blank">Homepage</a>
@@ -509,8 +533,8 @@ $ curl -XPUT 'http://localhost:9200/bank/customers/_mapping' -d '{
               <div id="collapse211" class="accordion-body collapse">
                 <div class="accordion-inner">
 <pre>$ cd elasticsearch-0.20.6/bin
-$ ./plugin -install elasticsearch/elasticsearch-mapper-attachments/1.6.0
-$ ./plugin -url https://github.com/downloads/richardwilly98/elasticsearch-river-mongodb/elasticsearch-river-mongodb-1.6.4.zip -install river-mongodb</pre>
+$ ./plugin -install elasticsearch/elasticsearch-mapper-attachments/1.6.0 #Attention ! Ca peut prendre un peu de temps... Et remplir votre prompt de point pendant un moment !
+$ ./plugin -i river-mongodb -u https://github.com/downloads/richardwilly98/elasticsearch-river-mongodb/elasticsearch-river-mongodb-1.6.4.zip</pre>
                 </div>
               </div>
             </div>
@@ -536,8 +560,8 @@ $ ./plugin -install lukas-vlcek/bigdesk
               </div>
             </div>
           </div>          
-
-<h3>12. Initialiser la river mongodb (3/3)</h3>
+Un fois installé, vous pouvez accéder à l'interface du plugin ici : <a href="http://localhost:9200/_plugin/bigdesk/" target="_blank">http://localhost:9200/_plugin/bigdesk/</a>
+<h3>15. Initialiser la river mongodb (3/3)</h3>
 Initialiser la river mongodb pour créer l'index <b>bank</b>, avec des documents de type <b>customers</b><br><br>
 <div class="accordion" id="accordion111">
             <div class="accordion-group">
@@ -553,18 +577,19 @@ Initialiser la river mongodb pour créer l'index <b>bank</b>, avec des documents
               </div>
             </div>
           </div>
-          <div class="accordion" id="accordion112">
+          <div class="accordion" id="accordion113">
             <div class="accordion-group">
               <div class="accordion-heading">
-                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion112" href="#collapse112">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion113" href="#collapse113">
                   Solution
                 </a>
               </div>
-              <div id="collapse112" class="accordion-body collapse">
+              <div id="collapse113" class="accordion-body collapse">
                 <div class="accordion-inner">
 <pre>$ curl -XPOST 'http://localhost:9200/_river/bank_river/_meta' -d '{
   "type": "mongodb",
     "mongodb": {
+    "servers":[{ "host": "localhost", "port": "27017" }],
       "db": "test-es", 
       "collection": "customers"
     },
@@ -579,7 +604,7 @@ Initialiser la river mongodb pour créer l'index <b>bank</b>, avec des documents
           </div>
 L'activation de la river mongodb se manifest avec des logs dans la console. On peut aussi voir l'activité sur le plugin <a href="http://localhost:9200/_plugin/bigdesk/" target="_blank">bigdesk</a>. L'indexation doit prendre moins de 5 minutes.
 
-<h3>13. Afficher le mapping</h3>
+<h3>16. Afficher le mapping</h3>
 Afficher le mapping de l'index créé pour s'assurer du type de chacun des champs.<br><br>
 <div class="accordion" id="accordion122">
             <div class="accordion-group">
@@ -595,7 +620,7 @@ Afficher le mapping de l'index créé pour s'assurer du type de chacun des champ
               </div>
             </div>
           </div>
-<h3>14. Chercher des documents (avancé 1/2)</h3>
+<h3>17. Chercher des documents (avancé 1/2)</h3>
 Ecrire une requête qui retourne les personnes dont leur enrollmentDate est avant le 1er janvier 2000 (strictement) triés du plus récent au plus ancien en comptant le nombre de compte encore ouvert (traduit par le champ closingDate dans account à null).<br><br>
 <div class="accordion" id="accordion131">
             <div class="accordion-group">
@@ -637,7 +662,7 @@ Ecrire une requête qui retourne les personnes dont leur enrollmentDate est avan
               </div>
             </div>
           </div>
-<h3>15. Chercher des documents(avancé 2/2)</h3>
+<h3>18. Chercher des documents(avancé 2/2)</h3>
 Chercher les personnes qui se trouvent à moins de 20km de Paris.<br><br>
 <div class="accordion" id="accordion141">
             <div class="accordion-group">
@@ -676,10 +701,10 @@ Chercher les personnes qui se trouvent à moins de 20km de Paris.<br><br>
               </div>
             </div>
           </div>
-<h3>16. Ajouter un document mongo et voir que l’index l’a pris en compte grâce a la river</h3>
+<h3>19. Ajouter un document mongo et voir que l’index l’a pris en compte grâce a la river</h3>
 Ajouter un document pour s'assurer que le document est bien disponible sur l'index.
 
-<h3>18. Bonux pour les rapides</h3>
+<h3>20. Bonux pour les rapides</h3>
 Instancier un elasticsearch sur une instance EC2 et faire de telle manière que l'on puisse faire un AMI pour instancier de nouveaux noeuds juste en démarrant une instance EC2 de l'AMI. Faire de telle manière que l'index est stocké sur S3. Un bon tutorial se trouve <a href="http://www.elasticsearch.org/tutorials/elasticsearch-on-ec2/" target="_blank">ici</a> si besoin :)
 <br><br><br><br><br><br>
         </div>

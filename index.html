@@ -589,7 +589,7 @@ Initialiser la river mongodb pour créer l'index <b>bank</b>, avec des documents
 <pre>$ curl -XPOST 'http://localhost:9200/_river/bank_river/_meta' -d '{
   "type": "mongodb",
     "mongodb": {
-    "servers":[{ "host": "192.168.0.235", "port": "27017" }],
+    "servers":[{ "host": "10.1.2.102", "port": "27017" }],
       "db": "test-es", 
       "collection": "customers"
     },

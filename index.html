@@ -589,7 +589,7 @@ Initialiser la river mongodb pour créer l'index <b>bank</b>, avec des documents
 <pre>$ curl -XPOST 'http://localhost:9200/_river/bank_river/_meta' -d '{
   "type": "mongodb",
     "mongodb": {
-    "servers":[{ "host": "localhost", "port": "27017" }],
+    "servers":[{ "host": "192.168.0.235", "port": "27017" }],
       "db": "test-es", 
       "collection": "customers"
     },
@@ -687,9 +687,6 @@ Chercher les personnes qui se trouvent à moins de 20km de Paris.<br><br>
               <div id="collapse142" class="accordion-body collapse">
                 <div class="accordion-inner">
 <pre>$ curl -XGET 'http://localhost:9200/bank/customers/_search?pretty=true' -d '{
-  "query": {
-    "match_all": {}
-  },
   "filter": {
     "geo_distance": {
       "distance": "20km",
